@@ -84,7 +84,7 @@ The main dataset used is [employee_attrition.csv](./datasets/employee_attrition.
 ## Project Structure
 
 ```
-employee-attrition/
+employee-attrition-model/
 ├── datasets/
 │   ├── employee_attrition.csv          # Main dataset (74,500 records)
 │   └── data-engg/                      # Processed datasets at each pipeline stage
