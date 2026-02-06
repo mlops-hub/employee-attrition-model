@@ -1,10 +1,5 @@
-
 import pandas as pd
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parents[2]
-EDA_PATH = BASE_DIR / "datasets" / "data-engg" / "03_eda_df.csv"
-CLEANED_PATH = BASE_DIR / "datasets" / "data-engg" / "04_cleaned_df.csv"
+from config.paths import EDA_PATH, CLEANING_PATH
 
 def clean_data(df):
     print("--- Find duplicates ---")
@@ -15,7 +10,7 @@ def clean_data(df):
     missing_values = df.isnull().sum()
     print(f"Missing values: {missing_values}")
 
-    df.to_csv(CLEANED_PATH, index=False)
+    df.to_csv(CLEANING_PATH, index=False)
 
     return df
 

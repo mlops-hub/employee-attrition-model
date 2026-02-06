@@ -1,11 +1,7 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parents[2]
-VALIDATION_PATH = BASE_DIR / "datasets" / "data-engg" / "02_validation.csv"
-EDA_PATH = BASE_DIR / "datasets" / "data-engg" / "03_eda_df.csv"
+from config.paths import VALIDATION_PATH, EDA_PATH
 
 def eda_data(df):
     # Basic statistics

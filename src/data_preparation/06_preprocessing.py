@@ -1,17 +1,9 @@
-import os
 import pandas as pd
-from pathlib import Path
 import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from config.paths import FEATURED_PATH, PREPROCESSED_TRAIN_PATH, PREPROCESSED_TEST_PATH, PREPROCESSOR_PATH
 
-BASE_DIR = Path(__file__).resolve().parents[2]
-FEATURED_PATH = BASE_DIR / "datasets" / "data-engg" / "05_feature_engg_df.csv"
-PREPROCESSED_PATH = BASE_DIR / "datasets" / "data-engg"
-SCALER_PATH = BASE_DIR / "artifacts" / "model_v1"
-os.makedirs(SCALER_PATH, exist_ok=True)
-
-SCALER_PREPROCESSOR_PATH = SCALER_PATH / "preprocessor.pkl"
 
 def preprocess_data(df):
     df_pp = df.copy()
@@ -31,7 +23,7 @@ def preprocess_data(df):
     X_train[numeric_cols] = scaler.fit_transform(X_train[numeric_cols])
     X_test[numeric_cols] = scaler.transform(X_test[numeric_cols])
 
-    joblib.dump(scaler, SCALER_PREPROCESSOR_PATH)
+    joblib.dump(scaler, PREPROCESSOR_PATH)
 
     # 🔑 RESET INDICES (CRITICAL)
     X_train = X_train.reset_index(drop=True)
@@ -43,8 +35,8 @@ def preprocess_data(df):
     test_df = pd.concat([X_test, y_test], axis=1)
 
     # Save preprocessed data
-    train_df.to_csv(PREPROCESSED_PATH / "06_preprocess_train_df.csv", index=False)
-    test_df.to_csv(PREPROCESSED_PATH / "06_preprocess_test_df.csv", index=False)
+    train_df.to_csv(PREPROCESSED_TRAIN_PATH, index=False)
+    test_df.to_csv(PREPROCESSED_TEST_PATH, index=False)
 
 
     print("Preprocessing completed and data saved.")

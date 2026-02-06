@@ -1,17 +1,13 @@
-import os
 import pandas as pd
-from pathlib import Path
 import joblib
 from sklearn.model_selection import cross_val_score, StratifiedKFold
+from config.paths import PREPROCESSED_TRAIN_PATH, MODEL_PATH
 
 
-BASE_DIR = Path(__file__).resolve().parents[2]
-PREPROCESSED_TRAIN_PATH = BASE_DIR / "datasets" / "data-engg" / "06_preprocess_train_df.csv"
+def cv_data(X_train, y_train):
 
-MODEL_ARTIFACT = BASE_DIR / "artifacts" / "model_v1" / "model.pkl"
+    model = joblib.load(MODEL_PATH)
 
-
-def cv_data(X_train, y_train, model):
     strat_cv = StratifiedKFold(n_splits=2, shuffle=True, random_state=42)
     cv_scores = cross_val_score(model, X_train, y_train, cv=strat_cv, scoring='recall')
 
@@ -26,6 +22,4 @@ if __name__ == "__main__":
     X_train = df_train.drop(columns=['Attrition'])
     y_train = df_train['Attrition']
 
-    model = joblib.load(MODEL_ARTIFACT)
-
-    cv_data(X_train, y_train, model)
+    cv_data(X_train, y_train)

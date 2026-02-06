@@ -1,24 +1,16 @@
-import os
 import pandas as pd
 import numpy as np
-from pathlib import Path
 import joblib
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, precision_score, recall_score, f1_score, roc_auc_score
-
-BASE_DIR = Path(__file__).resolve().parents[2]
-PREPROCESSED_TRAIN_PATH = BASE_DIR / "datasets" / "data-engg" / "06_preprocess_train_df.csv"
-PREPROCESSED_TEST_PATH = BASE_DIR / "datasets" / "data-engg" / "06_preprocess_test_df.csv"
+from config.paths import PREPROCESSED_TRAIN_PATH, PREPROCESSED_TEST_PATH, MODEL_PATH
 
 
-MODEL_ARTIFACT = BASE_DIR / "artifacts" / "model_v1" / "model.pkl"
-os.makedirs(MODEL_ARTIFACT.parent, exist_ok=True)
-
-
-def evaluate_data(X_train, y_train, X_test, y_test, model):
+def evaluate_data(X_train, y_train, X_test, y_test):
     # predict
+    model = joblib.load(MODEL_PATH)
+
     y_pred = model.predict(X_test)
-    y_pred_proba = model.predict_proba(X_test)[:, 1]
 
     # metrics
     accuracy = accuracy_score(y_test, y_pred)
@@ -76,6 +68,4 @@ if __name__ == "__main__":
     X_test = df_test.drop(columns=['Attrition'])
     y_test = df_test['Attrition']
 
-    model = joblib.load(MODEL_ARTIFACT)
-
-    evaluate_data(X_train, y_train, X_test, y_test, model)
+    evaluate_data(X_train, y_train, X_test, y_test)

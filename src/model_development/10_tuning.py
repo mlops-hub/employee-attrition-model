@@ -1,29 +1,23 @@
-import os
 import pandas as pd
-from pathlib import Path
 import joblib
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score, recall_score, precision_recall_curve
 from sklearn.model_selection import cross_val_score, StratifiedKFold
+from config.paths import PREPROCESSED_TRAIN_PATH, PREPROCESSED_TEST_PATH, MODEL_PATH, METRICS_PATH
 
 
-BASE_DIR = Path(__file__).resolve().parents[2]
-PREPROCESSED_TRAIN_PATH = BASE_DIR / "datasets" / "data-engg" / "06_preprocess_train_df.csv"
-PREPROCESSED_TEST_PATH = BASE_DIR / "datasets" / "data-engg" / "06_preprocess_test_df.csv"
+def tuning_data(X_train, y_train, X_test, y_test):
 
-MODEL_ARTIFACT = BASE_DIR / "artifacts" / "model_v1" / "model.pkl"
-BEST_MODEL_ARTIFACT = BASE_DIR / "artifacts" / "model_v1" / "best_model.pkl"
-os.makedirs(BEST_MODEL_ARTIFACT.parent, exist_ok=True)
+    # load base model
+    model = joblib.load(MODEL_PATH)
 
-
-def tuning_data(X_train, y_train, X_test, y_test, model):
     # set parameters
     param_grid = {
-    'C': [0.01, 0.1, 1, 10, 100],
-    'solver': ['liblinear', 'saga'],
-    'l1_ratio': [0],     # equivalent to L2
-    'max_iter': [1000]
-}
+        'C': [0.01, 0.1, 1, 10, 100],
+        'solver': ['liblinear', 'saga'],
+        'l1_ratio': [0],     # equivalent to L2
+        'max_iter': [1000]
+    }
 
     # set cv
     strat_cv = StratifiedKFold(n_splits=2, shuffle=True, random_state=42)
@@ -36,7 +30,9 @@ def tuning_data(X_train, y_train, X_test, y_test, model):
 
     # get best model and save in models/
     tuned_model = grid.best_estimator_
-    joblib.dump(tuned_model, BEST_MODEL_ARTIFACT)
+
+    #  replace previous model with best one.
+    joblib.dump(tuned_model, MODEL_PATH)
     
     print(f'best params: {grid.best_params_}')
     print(f'best cv scores: {grid.best_score_ * 100}')
@@ -48,7 +44,6 @@ def tuning_data(X_train, y_train, X_test, y_test, model):
         
     # predict the output with tuned_model
     y_pred_ht = tuned_model.predict(X_test)
-    y_pred_proba_ht = tuned_model.predict_proba(X_test)[:, 1]
 
     # tuned model evaluation
     accuracy_ht = accuracy_score(y_test, y_pred_ht)
@@ -71,6 +66,14 @@ def tuning_data(X_train, y_train, X_test, y_test, model):
     print(f"Base Model CV:     {base_cv_scores.mean():.4f} (+/- {base_cv_scores.std():.4f})")
     print(f"Tuned Model CV:    {tuned_cv_scores.mean():.4f} (+/- {tuned_cv_scores.std():.4f})")
 
+    metrics = {
+        "accuracy": accuracy_ht,
+        "recall": recall_ht
+    }
+    with open(METRICS_PATH, 'w') as f:
+        f.write(str(metrics))
+
+    return metrics 
 
 
 if __name__ == "__main__":
@@ -83,6 +86,4 @@ if __name__ == "__main__":
     X_test = df_test.drop(columns=['Attrition'])
     y_test = df_test['Attrition']
 
-    model = joblib.load(MODEL_ARTIFACT)
-
-    tuning_data(X_train, y_train, X_test, y_test, model)
+    tuning_data(X_train, y_train, X_test, y_test)

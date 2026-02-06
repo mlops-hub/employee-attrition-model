@@ -1,34 +1,24 @@
-import os
 import pandas as pd
-from pathlib import Path
 import joblib
 from sklearn.linear_model import LogisticRegression
-
-BASE_DIR = Path(__file__).resolve().parents[2]
-PREPROCESSED_TRAIN_PATH = BASE_DIR / "datasets" / "data-engg" / "06_preprocess_train_df.csv"
-
-ARTIFACT_PATH = BASE_DIR / "artifacts" / "model_v1"
-os.makedirs(ARTIFACT_PATH, exist_ok=True)
-
-MODEL_ARTIFACT = ARTIFACT_PATH / "model.pkl"
-FEATURE_STORE = ARTIFACT_PATH / "features.pkl"
+from config.paths import PREPROCESSED_TRAIN_PATH, MODEL_PATH, FEATURE_STORE_PATH
 
 
-def trianing_data(df):
+def trian_data(df):
     # df = df.dropna()
     X_train = df.drop(columns=['Attrition'])
     y_train = df['Attrition']
 
     # save features before training
     feature_columns = X_train.columns.to_list()
-    joblib.dump(feature_columns, FEATURE_STORE)
+    joblib.dump(feature_columns, FEATURE_STORE_PATH)
 
     print("Training the model....")
     model = LogisticRegression(max_iter=1000, class_weight='balanced')
     model.fit(X_train, y_train)
 
     print("training completed...")
-    joblib.dump(model, MODEL_ARTIFACT)
+    joblib.dump(model, MODEL_PATH)
 
     return True
 
@@ -36,4 +26,4 @@ def trianing_data(df):
 
 if __name__ == "__main__":
     df_train = pd.read_csv(PREPROCESSED_TRAIN_PATH)
-    trianing_data(df_train)
+    trian_data(df_train)

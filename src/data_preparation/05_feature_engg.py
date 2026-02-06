@@ -4,13 +4,8 @@
 # | **Company Tenure**   | Total years employed at the company    | Usually ≥ Years at Company     |
 
 
-import os
 import pandas as pd
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parents[2]
-CLEANED_PATH = BASE_DIR / "datasets" / "data-engg" / "04_cleaned_df.csv"
-FEATURED_PATH = BASE_DIR / "datasets" / "data-engg" / "05_feature_engg_df.csv"
+from config.paths import CLEANING_PATH, FEATURED_PATH
 
 def feature_data(df):
     df_fe = df.copy()
@@ -101,5 +96,5 @@ def feature_data(df):
 
 
 if __name__ == "__main__":
-    df = pd.read_csv(CLEANED_PATH)
+    df = pd.read_csv(CLEANING_PATH)
     feature_data(df)
