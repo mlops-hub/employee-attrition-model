@@ -38,7 +38,7 @@ def preprocess_data(df):
     train_df.to_csv(PREPROCESSED_TRAIN_PATH, index=False)
     test_df.to_csv(PREPROCESSED_TEST_PATH, index=False)
 
-
+    print(train_df.head())
     print("Preprocessing completed and data saved.")
     return train_df, test_df
 

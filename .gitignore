@@ -4,4 +4,5 @@
 venv/
 
 */__pycache__
-/datasets/data-engg
+*/*/__pycache__
+/datasets/data-preparation

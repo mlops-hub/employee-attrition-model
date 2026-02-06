@@ -53,8 +53,7 @@ def evaluate_data(X_train, y_train, X_test, y_test):
     plt.title("Logistic Regression Feature Importance")
     plt.show()
 
-
-    return accuracy
+    return recall
 
 
 

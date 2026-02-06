@@ -4,7 +4,7 @@ from sklearn.linear_model import LogisticRegression
 from config.paths import PREPROCESSED_TRAIN_PATH, MODEL_PATH, FEATURE_STORE_PATH
 
 
-def trian_data(df):
+def train_data(df):
     # df = df.dropna()
     X_train = df.drop(columns=['Attrition'])
     y_train = df['Attrition']
@@ -26,4 +26,4 @@ def trian_data(df):
 
 if __name__ == "__main__":
     df_train = pd.read_csv(PREPROCESSED_TRAIN_PATH)
-    trian_data(df_train)
+    train_data(df_train)

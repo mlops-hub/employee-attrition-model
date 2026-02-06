@@ -2,8 +2,6 @@ import pandas as pd
 import joblib
 from config.paths import MODEL_PATH, FEATURE_STORE_PATH, PREPROCESSOR_PATH
 
-THRESHOLD_VALUE = 0.65
-
 
 def test(input_data: dict):
     # Load artifacts
@@ -11,7 +9,6 @@ def test(input_data: dict):
         model = joblib.load(MODEL_PATH)
         features = joblib.load(FEATURE_STORE_PATH)
         preprocessor = joblib.load(PREPROCESSOR_PATH)
-        print("✅ Artifacts Loaded!")
     except Exception as e:
         print(f"❌ Error loading artifacts: {e}")
         return
@@ -24,12 +21,22 @@ def test(input_data: dict):
     df_input[numeric_cols] = preprocessor.transform(df_input[numeric_cols])
 
     # Predict probability
-    probability = model.predict_proba(df_input)[0][1]
-    prediction = 1 if probability >= THRESHOLD_VALUE else 0
+    prediction = model.predict(df_input)[0]
+    print('prediciton value: ', prediction)
+    print("😢 Leave" if prediction == 1 else "😃 Stay")
 
-    print(f"\nAttrition Probability: {probability:.4f}")
-    print(f"⌛ Prediction: {prediction}")
-    print(f"Final verdict: {'😢 Leave' if 1 else '😃 Stay'}")
+    probability = model.predict_proba(df_input)[0]
+    p_stay = probability[0]
+    p_leave = probability[1]
+
+    if p_leave >= 0.65:
+        print(f'⏰ Risk: High ({p_leave})')
+    elif p_leave >= 0.45:
+        print(f'⏰ Risk: Medium ({p_leave})')
+    elif p_leave >= 0.25:
+        print(f'⏰ Risk: Low ({p_leave})')
+    else:
+        print(f'⏰ Risk: Very Low ({p_leave})')
 
     return probability, prediction
 

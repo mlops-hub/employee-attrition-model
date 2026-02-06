@@ -16,7 +16,7 @@ EDA_PATH = DATA_PREP_DIR / "03_eda_df.csv"
 CLEANING_PATH = DATA_PREP_DIR / "04_cleaning.csv"
 FEATURED_PATH = DATA_PREP_DIR / "05_feature_engg_df.csv"
 PREPROCESSED_TRAIN_PATH = DATA_PREP_DIR / "06_train_df.csv"
-PREPROCESSED_TEST_PATH = "06_test_df.csv"
+PREPROCESSED_TEST_PATH = DATA_PREP_DIR / "06_test_df.csv"
 
 
 # Model artifacts

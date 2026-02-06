@@ -15,14 +15,23 @@
 - [Datasets](#datasets)
 - [Features](#features)
 - [Project Structure](#project-structure)
+  - [Directory Details](#directory-details)
+- [Tech Stack](#tech-stack)
+- [Implementation of ML Model](#implementation-of-ml-model)
+  - [1. Data Preparation](#1-data-preparation)
+  - [2. Model Development](#2-model-development)
+  - [3.a Testing](#3a-testing)
+  - [3.b Frontend](#3b-frontend)
 - [Setup & Installation](#setup--installation)
-    - [Create Virtual Environment](#step-1-create-virtual-environment)
-    - [Install Dependencies](#step-2-install-dependencies)
-    - [Training the Model](#step-3-training-the-model)
-    - [Testing/Prediction](#step-4-testingprediction)
-- [ML Pipeline](#ml-pipeline)
-- [Frontend](#frontend)
-- [Contribution](#contribution)
+  - [Step 1: Create Virtual Environment](#step-1-create-virtual-environment)
+  - [Step 2: Install Dependencies](#step-2-install-dependencies)
+  - [Step 3: Run Data Pipeline](#step-3-run-data-pipeline)
+  - [Step 4: Train & Evaluate Model](#step-4-train--evaluate-model)
+  - [Step 5: Test Predictions](#step-5-test-predicitions)
+  - [Step 6: Run Web Application](#step-6-run-web-application)
+- [Key Findings](#key-findings)
+- [Contributing](#contributing)
+- [License](#license)
 
 
 ## Overview
@@ -85,43 +94,52 @@ The main dataset used is [employee_attrition.csv](./datasets/employee_attrition.
 
 ```
 employee-attrition-model/
-├── datasets/
-│   ├── employee_attrition.csv          # Main dataset (74,500 records)
-│   └── data-engg/                      # Processed datasets at each pipeline stage
-│       ├── 01_ingestion.csv
-│       ├── 02_validation.csv
-│       ├── 03_eda_df.csv
-│       ├── 04_cleaned_df.csv
-│       ├── 05_feature_engg_df.csv
-│       └── 06_preprocess_train/test_df.csv
-├── artifacts/                          # Trained models and artifacts
-│   ├── model_v1/
-│   └── model_v2/
-├── src/
-│   ├── data-pipeline/                  # Data engineering pipeline
-│   │   ├── _01_ingestion.py            # Data loading and exploration
-│   │   ├── _02_validation.py           # Data validation with Pandera
-│   │   ├── _03_eda.py                  # Exploratory data analysis
-│   │   ├── _04_cleaning.py             # Data cleaning
-│   │   ├── _05_feature_engg.py         # Feature engineering
-│   │   └── _06_preprocessing.py        # Preprocessing & scaling
-│   └── model-pipeline/                 # Model development pipeline
-│       ├── _07_training.py             # Model training
-│       ├── _08_evaluation.py           # Model evaluation
-│       ├── _09_cross_validation.py     # Cross-validation
-│       ├── _10_tuning.py               # Hyperparameter tuning
-├── frontend/
-│   ├── app.py                          # Flask web application
-│   ├── static/
-│   │   ├── css/style.css
-│   │   └── js/script.js
-│   └── templates/
-│       └── index.html
-├── notebook/
-│   └── test.ipynb                      # Jupyter notebook for experimentation
-├── requirements.txt
-└── README.md
+│
+├── 📂 artifacts/
+│   └── metrics.txt                      # Model performance metrics and results
+│
+├── 📂 datasets/
+│   ├── employee_attrition.csv           # Main dataset (74,500 employee records)
+│   └── 📂 data-preparation/             # Processed datasets at each pipeline stage
+├── 📂 src/
+│   ├── 📂 config/                      # Configuration for project paths
+│   │
+│   ├── 📂 data_preparation/            # Data Engineering Pipeline (Step 1-6)
+│   │   ├── 01_ingestion.py             
+│   │   ├── 02_validation.py            
+│   │   ├── 03_eda.py                   
+│   │   ├── 04_cleaning.py             
+│   │   ├── 05_feature_engg.py          
+│   │   ├── 06_preprocessing.py         
+│   │
+│   ├── 📂 model_development/           # ML Model Development Pipeline (Step 7-10)
+│   │   ├── 07_training.py              
+│   │   ├── 08_evaluation.py            
+│   │   ├── 09_cross_validation.py      
+│   │   ├── 10_tuning.py                
+│   │
+│   └── 📂 testing/
+│       ├── predict.py                  # Inference module for making predictions on new data
+│
+├── 📂 frontend/                        # Flask application entry point
+├── 📂 notebook/                        # Jupyter Notebook for experimentation and exploration
+|                  
+├── README.md                           # Project documentation (this file)
+└── requirements.txt                    # Python package dependencies
 ```
+
+### Directory Details
+
+| Directory | Purpose |
+|-----------|---------|
+| `artifacts/` | Stores trained models, metrics, and performance results |
+| `datasets/` | Contains raw and processed data at each pipeline stage |
+| `src/config/` | Project configuration and path management |
+| `src/data_preparation/` | Data engineering and preprocessing modules (6 sequential steps) |
+| `src/model_development/` | ML model training, evaluation, and tuning (4 sequential steps) |
+| `src/testing/` | Prediction/inference module for model testing |
+| `frontend/` | Flask web application with UI for predictions |
+| `notebook/` | Jupyter notebooks for data exploration and experimentation |
 
 
 ## Tech Stack
@@ -135,9 +153,9 @@ employee-attrition-model/
 - **Model Format**: Pickle (.pkl)
 
 
-## ML Model Pipeline
+## Implementation of ML Model
 
-### 1. Data Engineering Pipeline
+### 1. Data Preparation
 - **Ingestion**: Load raw data from CSV
 - **Validation**: Schema validation using Pandera
 - **EDA**: Exploratory Data Analysis - understand data patterns
@@ -145,13 +163,16 @@ employee-attrition-model/
 - **Feature Engineering**: Create new features, encoding categorical variables
 - **Preprocessing**: Scaling, normalization, train-test split
 
-### 2. Model Development Pipeline
+### 2. Model Development
 - **Training**: Train classification models (Logistic Regression, Random Forest, etc.)
 - **Evaluation**: Accuracy, precision, recall, F1-score, confusion matrix
 - **Cross-Validation**: K-fold validation for robust assessment
 - **Hyperparameter Tuning**: GridSearch/RandomSearch for optimal parameters
 
-### 3. Frontend
+### 3.a. Testing
+- **predict.py**: Test prediction of the trained model in this file.
+
+### 3.b. Frontend
 - Flask-based web application for model inference
 - Real-time predictions on new employee data
 
@@ -183,13 +204,15 @@ pip install -r requirements.txt
 Execute each data engineering step sequentially:
 
 ```bash
-cd src/data-pipeline
-python _01_ingestion.py
-python _02_validation.py
-python _03_eda.py
-python _04_cleaning.py
-python _05_feature_engg.py
-python _06_preprocessing.py
+cd src
+
+python -m data_preparation.01_ingestion.py
+python -m data_preparation.02_validation.py
+python -m data_preparation.03_eda.py
+python -m data_preparation.04_cleaning.py
+python -m data_preparation.05_feature_engg.py
+python -m data_preparation.06_preprocessing.py
+
 ```
 
 #### Step 4: Train & Evaluate Model
@@ -197,14 +220,23 @@ python _06_preprocessing.py
 Once data is preprocessed, run model development pipeline:
 
 ```bash
-cd ../model-pipeline
-python _07_training.py       # Train the model
-python _08_evaluation.py     # Evaluate performance
-python _09_cross_validation.py  # Validate robustness
-python _10_tuning.py         # Hyperparameter optimization
+cd src
+
+python -m model_development.t07_training.py          
+python -m model_development.08_evaluation.py       
+python -m model_development.09_cross_validation.py  
+python -m model_development.10_tuning.py     
+
 ```
 
-#### Step 5: Run Web Application
+#### Step-5: Test Predicitions
+
+```bash
+cd src
+pytohn -m testing.predict
+```
+
+#### Step 6: Run Web Application
 
 ```bash
 cd ../../frontend
@@ -212,41 +244,6 @@ python app.py
 ```
 
 Access the application at `http://localhost:5000`
-
-
-## Usage
-
-**For Prediction on New Data:**
-
-Load the trained model and make predictions:
-
-```python
-import pickle
-import pandas as pd
-
-# Load model
-with open('artifacts/model_v1/model.pkl', 'rb') as f:
-    model = pickle.load(f)
-
-# Load preprocessor
-with open('artifacts/model_v1/preprocessor.pkl', 'rb') as f:
-    features = pickle.load(f)
-
-# Prepare new employee data
-new_employee = pd.DataFrame({
-    'Age': [35],
-    'Monthly Income': [6000],
-    # ... other features
-})
-
-# Preprocess and predict
-processed = preprocessor.transform(new_employee)
-prediction = model.predict(processed)
-probability = model.predict_proba(processed)
-
-print(f"Attrition Risk: {prediction[0]}")
-print(f"Probability: {probability[0]}")
-```
 
 
 ## Key Findings
