@@ -6,9 +6,9 @@ from flask_cors import CORS
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-ARTIFACT_PATH = BASE_DIR / "artifacts" / "model_v1"
+ARTIFACT_PATH = BASE_DIR / "artifacts"
 
-MODEL_ARTIFACT = ARTIFACT_PATH / "best_model.pkl"
+MODEL_ARTIFACT = ARTIFACT_PATH / "model.pkl"
 FEATURE_STORE = ARTIFACT_PATH / "features.pkl"
 SCALER_PATH = ARTIFACT_PATH / "preprocessor.pkl"
 
