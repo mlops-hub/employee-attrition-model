@@ -9,7 +9,8 @@ from config.paths import PREPROCESSED_TRAIN_PATH, PREPROCESSED_TEST_PATH, MODEL_
 def tuning_data(X_train, y_train, X_test, y_test):
 
     # load base model
-    model = joblib.load(MODEL_PATH)
+    artifact = joblib.load(MODEL_PATH)
+    model = artifact["model"]
 
     # set parameters
     param_grid = {
@@ -32,7 +33,8 @@ def tuning_data(X_train, y_train, X_test, y_test):
     tuned_model = grid.best_estimator_
 
     #  replace previous model with best one.
-    joblib.dump(tuned_model, MODEL_PATH)
+    artifact["model"] = tuned_model
+    joblib.dump(artifact, MODEL_PATH)
     
     print(f'best params: {grid.best_params_}')
     print(f'best cv scores: {grid.best_score_ * 100}')

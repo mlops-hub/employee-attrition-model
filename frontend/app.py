@@ -7,19 +7,17 @@ from flask_cors import CORS
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 ARTIFACT_PATH = BASE_DIR / "artifacts"
-
 MODEL_ARTIFACT = ARTIFACT_PATH / "model.pkl"
-FEATURE_STORE = ARTIFACT_PATH / "features.pkl"
-SCALER_PATH = ARTIFACT_PATH / "preprocessor.pkl"
 
-THRESHOLD = 0.35 # tuned for recall``
+THRESHOLD = 0.35 # tuned for recall
 
 app = Flask(__name__)
 CORS(app)
 
-model = joblib.load(MODEL_ARTIFACT)
-features = joblib.load(FEATURE_STORE)
-prerpocessor = joblib.load(SCALER_PATH)
+artifact = joblib.load(MODEL_ARTIFACT)
+model = artifact["model"]
+features = artifact["features"]
+preprocessor = artifact["preprocessor"]
 
 
 @app.route('/')
@@ -36,7 +34,7 @@ def predict():
         df_input = pd.DataFrame([data], columns=features)
 
         numeric_cols = ['Years at Company', 'Company Tenure', 'RoleStagnationRatio', 'TenureGap']
-        df_input[numeric_cols] = prerpocessor.transform(df_input[numeric_cols])
+        df_input[numeric_cols] = preprocessor.transform(df_input[numeric_cols])
 
         probability = model.predict_proba(df_input)[0]
         p_stay = float(probability[0])

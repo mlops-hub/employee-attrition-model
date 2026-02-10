@@ -1,24 +1,28 @@
 import pandas as pd
 import joblib
 from sklearn.linear_model import LogisticRegression
-from config.paths import PREPROCESSED_TRAIN_PATH, MODEL_PATH, FEATURE_STORE_PATH
+from config.paths import PREPROCESSED_TRAIN_PATH, MODEL_PATH, PREPROCESSOR_PATH
 
 
 def train_data(df):
-    # df = df.dropna()
     X_train = df.drop(columns=['Attrition'])
     y_train = df['Attrition']
 
-    # save features before training
     feature_columns = X_train.columns.to_list()
-    joblib.dump(feature_columns, FEATURE_STORE_PATH)
 
     print("Training the model....")
     model = LogisticRegression(max_iter=1000, class_weight='balanced')
     model.fit(X_train, y_train)
-
     print("training completed...")
-    joblib.dump(model, MODEL_PATH)
+
+    # Bundle model, features, and preprocessor into single artifact
+    preprocessor = joblib.load(PREPROCESSOR_PATH)
+    artifact = {
+        "model": model,
+        "features": feature_columns,
+        "preprocessor": preprocessor
+    }
+    joblib.dump(artifact, MODEL_PATH)
 
     return True
 

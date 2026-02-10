@@ -22,7 +22,6 @@ PREPROCESSED_TEST_PATH = DATA_PREP_DIR / "06_test_df.csv"
 # Model artifacts
 ARTIFACT_DIR = BASE_DIR / "artifacts"
 MODEL_PATH = ARTIFACT_DIR / "model.pkl"
-FEATURE_STORE_PATH = ARTIFACT_DIR / "features.pkl"
 PREPROCESSOR_PATH = ARTIFACT_DIR / "preprocessor.pkl"
 METRICS_PATH = ARTIFACT_DIR / "metrics.txt"
 
