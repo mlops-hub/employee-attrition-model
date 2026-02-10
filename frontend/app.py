@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 ARTIFACT_PATH = BASE_DIR / "artifacts"
 MODEL_ARTIFACT = ARTIFACT_PATH / "model.pkl"
 
-THRESHOLD = 0.35 # tuned for recall
+THRESHOLD = 0.50
 
 app = Flask(__name__)
 CORS(app)
