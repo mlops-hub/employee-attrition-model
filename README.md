@@ -236,7 +236,7 @@ python -m testing.predict
 #### Step 6: Run Web Application
 
 ```bash
-cd ../../frontend
+cd ../frontend
 python app.py
 ```
 
