@@ -4,51 +4,44 @@ from config.paths import MODEL_PATH
 
 
 def test(input_data: dict):
-    # Load artifacts
+    # Load model (wrapped: predict() returns probabilities)
     try:
-        artifact = joblib.load(MODEL_PATH)
-        model = artifact["model"]
-        features = artifact["features"]
-        preprocessor = artifact["preprocessor"]
+        model = joblib.load(MODEL_PATH)
     except Exception as e:
-        print(f"❌ Error loading artifacts: {e}")
+        print(f"Error loading model: {e}")
         return
 
-    # Convert input to DataFrame with correct column order
-    df_input = pd.DataFrame([input_data], columns=features)
+    # Convert input to DataFrame
+    df_input = pd.DataFrame([input_data])
 
-    # Scale numeric columns
-    numeric_cols = ['Years at Company', 'Company Tenure', 'RoleStagnationRatio', 'TenureGap']
-    df_input[numeric_cols] = preprocessor.transform(df_input[numeric_cols])
-
-    # Predict probability
-    prediction = model.predict(df_input)[0]
-    print('prediciton value: ', prediction)
-    print("😢 Leave" if prediction == 1 else "😃 Stay")
-
-    probability = model.predict_proba(df_input)[0]
+    # predict() returns [[p_stay, p_leave]]
+    probability = model.predict(df_input)[0]
     p_stay = probability[0]
     p_leave = probability[1]
 
+    prediction = 1 if p_leave >= 0.50 else 0
+    print('prediciton value: ', prediction)
+    print("😢 Leave" if prediction == 1 else "😃 Stay")
+
     if p_leave >= 0.65:
-        print(f'⏰ Risk: High ({p_leave})')
+        print(f'⏰ Risk: High ({p_leave:.4f})')
     elif p_leave >= 0.45:
-        print(f'⏰ Risk: Medium ({p_leave})')
+        print(f'⏰ Risk: Medium ({p_leave:.4f})')
     elif p_leave >= 0.25:
-        print(f'⏰ Risk: Low ({p_leave})')
+        print(f'⏰ Risk: Low ({p_leave:.4f})')
     else:
-        print(f'⏰ Risk: Very Low ({p_leave})')
+        print(f'⏰ Risk: Very Low ({p_leave:.4f})')
 
     return probability, prediction
 
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("👔 Employee Attrition Prediction App")
+    print("Employee Attrition Prediction App")
     print("=" * 60)
 
     # Collect inputs
-    print("Please Enter 'valid' values to get correct predicition:")
+    print("Please Enter 'valid' values to get correct prediction:")
     print("-" * 60)
 
     years_at_company = float(input('Years at Company: '))
@@ -63,9 +56,9 @@ if __name__ == "__main__":
     remote_work = int(input('Remote Work (No: 0, Yes: 1): '))
     company_reputation = float(input('Company Reputation (Poor: 1, Fair: 2, Good: 3, Excellent: 4): '))
     overall_satisfaction = float(input('Overall Satisfaction (Low: 1, Medium: 2, High: 3, Very High: 4): '))
-    opportunities = float(input('Opportunities (Low: 0, High: 1): '))
-    annual_income = int(input('Annual Income: '))
-    age_group = int(input('Age Group (till 65): '))
+    opportunities = float(input('Opportunities (Low: 1, Medium: 2, High: 3): '))
+    annual_income = int(input('Annual Income (0: Under 2.4L, 1: 2.4L–4.2L, 2: 4.2L–6L, 3: 6L–20L, 4: Above 20L): '))
+    age_group = int(input('Age Group (1: 18–25, 2: 25–35, 3: 35–45, 4: 45–60, 5: 60–65): '))
 
     # Derived features
     role_stagnation_ratio = round(years_at_company / (company_tenure + 1), 3)

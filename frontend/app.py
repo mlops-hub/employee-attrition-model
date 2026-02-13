@@ -1,23 +1,25 @@
-import joblib
-import pandas as pd
-from pathlib import Path
+import os
+import requests
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 
 
-BASE_DIR = Path(__file__).resolve().parents[1]
-ARTIFACT_PATH = BASE_DIR / "artifacts"
-MODEL_ARTIFACT = ARTIFACT_PATH / "model.pkl"
+# KServe endpoint
+MODEL_ENDPOINT = os.environ.get("MODEL_ENDPOINT", "http://localhost:8080/v1/models/model:predict")
 
 THRESHOLD = 0.50
 
+FEATURE_ORDER = [
+    "Years at Company", "Performance Rating", "Number of Promotions",
+    "Overtime", "Education Level", "Number of Dependents",
+    "Job Level", "Company Size", "Company Tenure", "Remote Work",
+    "Company Reputation", "OverallSatisfaction", "Opportunities",
+    "AnnualIncome", "AgeGroup", "RoleStagnationRatio", "TenureGap",
+    "EarlyCompanyTenureRisk", "LongTenureLowRoleRisk"
+]
+
 app = Flask(__name__)
 CORS(app)
-
-artifact = joblib.load(MODEL_ARTIFACT)
-model = artifact["model"]
-features = artifact["features"]
-preprocessor = artifact["preprocessor"]
 
 
 @app.route('/')
@@ -31,19 +33,21 @@ def predict():
     print('incoming-data: ', data)
 
     try:
-        df_input = pd.DataFrame([data], columns=features)
+        instance = [data[f] for f in FEATURE_ORDER]
+        payload = {"instances": [instance]}
 
-        numeric_cols = ['Years at Company', 'Company Tenure', 'RoleStagnationRatio', 'TenureGap']
-        df_input[numeric_cols] = preprocessor.transform(df_input[numeric_cols])
+        resp = requests.post(MODEL_ENDPOINT, json=payload, timeout=10)
+        resp.raise_for_status()
+        result = resp.json()
 
-        probability = model.predict_proba(df_input)[0]
-        p_stay = float(probability[0])
-        p_leave = probability[1]
-        print('proba: ', probability)
+        # model.predict() now returns [[p_stay, p_leave], ...]
+        probs = result["predictions"][0]
+        p_stay = float(probs[0])
+        p_leave = float(probs[1])
 
         prediction = int(p_leave >= THRESHOLD)
 
-        if p_leave < 0.30: 
+        if p_leave < 0.30:
             risk = "Low"
         elif p_leave < 0.60:
             risk = "Medium"
@@ -64,4 +68,4 @@ def predict():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)

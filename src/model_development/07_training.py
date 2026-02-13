@@ -1,28 +1,38 @@
 import pandas as pd
 import joblib
 from sklearn.linear_model import LogisticRegression
-from config.paths import PREPROCESSED_TRAIN_PATH, MODEL_PATH, PREPROCESSOR_PATH
+from sklearn.preprocessing import StandardScaler
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from config.paths import PREPROCESSED_TRAIN_PATH, MODEL_PATH
+
+# Columns that need scaling - must use integer indices for KServe compatibility
+# (KServe sends raw numpy arrays, not DataFrames)
+NUMERIC_COLS = ['Years at Company', 'Company Tenure', 'RoleStagnationRatio', 'TenureGap']
 
 
 def train_data(df):
     X_train = df.drop(columns=['Attrition'])
     y_train = df['Attrition']
 
-    feature_columns = X_train.columns.to_list()
+    # Get integer indices for numeric columns (required for KServe numpy input)
+    numeric_indices = [X_train.columns.get_loc(col) for col in NUMERIC_COLS]
+
+    preprocessor = ColumnTransformer(
+        transformers=[('scaler', StandardScaler(), numeric_indices)],
+        remainder='passthrough'
+    )
+
+    pipeline = Pipeline([
+        ('preprocessor', preprocessor),
+        ('classifier', LogisticRegression(max_iter=1000, class_weight='balanced'))
+    ])
 
     print("Training the model....")
-    model = LogisticRegression(max_iter=1000, class_weight='balanced')
-    model.fit(X_train, y_train)
+    pipeline.fit(X_train, y_train)
     print("training completed...")
 
-    # Bundle model, features, and preprocessor into single artifact
-    preprocessor = joblib.load(PREPROCESSOR_PATH)
-    artifact = {
-        "model": model,
-        "features": feature_columns,
-        "preprocessor": preprocessor
-    }
-    joblib.dump(artifact, MODEL_PATH)
+    joblib.dump(pipeline, MODEL_PATH)
 
     return True
 

@@ -14,6 +14,8 @@ document.getElementById('prediction-form').addEventListener('submit', async (e) 
     data["EarlyCompanyTenureRisk"] = yearsAtCompany <= 2 ? 1 : 0;
     data["LongTenureLowRoleRisk"] = (companyTenure > 5 && data["Job Level"] <= 2) ? 1 : 0;
 
+    const showResult = document.getElementById("result");
+
     try {
         const response = await fetch('/predict', {
             method: 'POST',
@@ -22,10 +24,15 @@ document.getElementById('prediction-form').addEventListener('submit', async (e) 
         });
 
         const result = await response.json();
-        console.log(result)
+        console.log(result);
 
-        const showResult = document.getElementById("result")
-        showResult.style.display = 'block'
+        if (result.error) {
+            showResult.style.display = 'block';
+            showResult.innerHTML = `<p class="text-danger text-center">Error: ${result.error}</p>`;
+            return;
+        }
+
+        showResult.style.display = 'block';
         showResult.innerHTML = `
             <h2 class="text-primary mb-3 text-center">Prediction Result</h2>
 
@@ -44,24 +51,20 @@ document.getElementById('prediction-form').addEventListener('submit', async (e) 
                     <h6 class="text-muted">Leave Probability</h6>
                     <h4 class="text-danger fw-bold">${(result.p_leave * 100).toFixed(2)}%</h4>
                 </div>
-
                 <div class="col-md-6">
-                <h6 class="text-muted">Stay Probability</h6>
-                <h4 class="text-success fw-bold">
-                    ${(result.p_stay * 100).toFixed(2)}%
-                </h4>
+                    <h6 class="text-muted">Stay Probability</h6>
+                    <h4 class="text-success fw-bold">${(result.p_stay * 100).toFixed(2)}%</h4>
                 </div>
             </div>
-
             <div class="alert alert-light text-center mb-0">
                 <small class="text-muted">
-                Decision threshold used: <strong>${result.threshold}</strong>
+                    Decision threshold used: <strong>${result.threshold}</strong>
                 </small>
             </div>
         `;
     } catch (error) {
         console.error("Prediction error:", error);
-        document.getElementById("result").innerHTML =
-            `<p class="text-danger">Prediction failed. Please try again.</p>`;
+        showResult.style.display = 'block';
+        showResult.innerHTML = `<p class="text-danger text-center">Prediction failed: ${error.message}</p>`;
     }
 });

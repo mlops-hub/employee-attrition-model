@@ -1,17 +1,30 @@
 import pandas as pd
 import numpy as np
 import joblib
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, precision_score, recall_score, f1_score, roc_auc_score
-from config.paths import PREPROCESSED_TRAIN_PATH, PREPROCESSED_TEST_PATH, MODEL_PATH
+from config.paths import PREPROCESSED_TRAIN_PATH, PREPROCESSED_TEST_PATH, MODEL_PATH, ARTIFACT_DIR
+
+
+def get_feature_names(pipeline, original_columns):
+    """Extract feature names in the order ColumnTransformer outputs them."""
+    ct = pipeline.named_steps['preprocessor']
+    feature_names = []
+    for name, transformer, indices in ct.transformers_:
+        if name == 'remainder':
+            feature_names.extend([original_columns[i] for i in indices])
+        else:
+            feature_names.extend([original_columns[i] for i in indices])
+    return feature_names
 
 
 def evaluate_data(X_train, y_train, X_test, y_test):
-    # predict
-    artifact = joblib.load(MODEL_PATH)
-    model = artifact["model"]
+    # load pipeline
+    pipeline = joblib.load(MODEL_PATH)
 
-    y_pred = model.predict(X_test)
+    y_pred = pipeline.predict(X_test)
 
     # metrics
     accuracy = accuracy_score(y_test, y_pred)
@@ -33,15 +46,15 @@ def evaluate_data(X_train, y_train, X_test, y_test):
     print(class_report)
 
     # train/test scores
-    train_score = model.score(X_train, y_train)
-    test_score = model.score(X_test, y_test)
+    train_score = pipeline.score(X_train, y_train)
+    test_score = pipeline.score(X_test, y_test)
 
     print('train score %: ', train_score * 100)
     print('test score %: ', test_score * 100)
 
     # feature importance
-    feature_names = X_train.columns
-    coef = model.coef_[0]
+    feature_names = get_feature_names(pipeline, X_train.columns.tolist())
+    coef = pipeline.named_steps['classifier'].coef_[0]
     coef_df = pd.DataFrame({'Feature': feature_names, 'Coefficient': coef})
     coef_df['Abs_Coefficient'] = np.abs(coef_df['Coefficient'])
     coef_df = coef_df.sort_values(by='Abs_Coefficient', ascending=False)
@@ -52,7 +65,7 @@ def evaluate_data(X_train, y_train, X_test, y_test):
     plt.gca().invert_yaxis()
     plt.xlabel("Coefficient")
     plt.title("Logistic Regression Feature Importance")
-    plt.show()
+    plt.tight_layout()
 
     return recall
 
