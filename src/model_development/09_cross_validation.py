@@ -6,7 +6,8 @@ from config.paths import PREPROCESSED_TRAIN_PATH, MODEL_PATH
 
 def cv_data(X_train, y_train):
 
-    model = joblib.load(MODEL_PATH)
+    artifact = joblib.load(MODEL_PATH)
+    model = artifact["model"]
 
     strat_cv = StratifiedKFold(n_splits=2, shuffle=True, random_state=42)
     cv_scores = cross_val_score(model, X_train, y_train, cv=strat_cv, scoring='recall')

@@ -95,9 +95,6 @@ The main dataset used is [employee_attrition.csv](./datasets/employee_attrition.
 ```
 employee-attrition-model/
 │
-├── 📂 artifacts/
-│   └── metrics.txt                      # Model performance metrics and results
-│
 ├── 📂 datasets/
 │   ├── employee_attrition.csv           # Main dataset (74,500 employee records)
 │   └── 📂 data-preparation/             # Processed datasets at each pipeline stage
@@ -119,7 +116,7 @@ employee-attrition-model/
 │   │   ├── 10_tuning.py                
 │   │
 │   └── 📂 testing/
-│       ├── predict.py                  # Inference module for making predictions on new data
+│       └── predict.py                  # Inference module for making predictions on new data
 │
 ├── 📂 frontend/                        # Flask application entry point
 ├── 📂 notebook/                        # Jupyter Notebook for experimentation and exploration
@@ -206,12 +203,12 @@ Execute each data engineering step sequentially:
 ```bash
 cd src
 
-python -m data_preparation.01_ingestion.py
-python -m data_preparation.02_validation.py
-python -m data_preparation.03_eda.py
-python -m data_preparation.04_cleaning.py
-python -m data_preparation.05_feature_engg.py
-python -m data_preparation.06_preprocessing.py
+python -m data_preparation.01_ingestion
+python -m data_preparation.02_validation
+python -m data_preparation.03_eda
+python -m data_preparation.04_cleaning
+python -m data_preparation.05_feature_engg
+python -m data_preparation.06_preprocessing
 
 ```
 
@@ -222,10 +219,10 @@ Once data is preprocessed, run model development pipeline:
 ```bash
 cd src
 
-python -m model_development.t07_training.py          
-python -m model_development.08_evaluation.py       
-python -m model_development.09_cross_validation.py  
-python -m model_development.10_tuning.py     
+python -m model_development.07_training
+python -m model_development.08_evaluation
+python -m model_development.09_cross_validation
+python -m model_development.10_tuning
 
 ```
 
@@ -233,13 +230,13 @@ python -m model_development.10_tuning.py
 
 ```bash
 cd src
-pytohn -m testing.predict
+python -m testing.predict
 ```
 
 #### Step 6: Run Web Application
 
 ```bash
-cd ../../frontend
+cd ../frontend
 python app.py
 ```
 

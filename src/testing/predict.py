@@ -1,14 +1,15 @@
 import pandas as pd
 import joblib
-from config.paths import MODEL_PATH, FEATURE_STORE_PATH, PREPROCESSOR_PATH
+from config.paths import MODEL_PATH
 
 
 def test(input_data: dict):
     # Load artifacts
     try:
-        model = joblib.load(MODEL_PATH)
-        features = joblib.load(FEATURE_STORE_PATH)
-        preprocessor = joblib.load(PREPROCESSOR_PATH)
+        artifact = joblib.load(MODEL_PATH)
+        model = artifact["model"]
+        features = artifact["features"]
+        preprocessor = artifact["preprocessor"]
     except Exception as e:
         print(f"❌ Error loading artifacts: {e}")
         return

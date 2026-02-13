@@ -8,7 +8,8 @@ from config.paths import PREPROCESSED_TRAIN_PATH, PREPROCESSED_TEST_PATH, MODEL_
 
 def evaluate_data(X_train, y_train, X_test, y_test):
     # predict
-    model = joblib.load(MODEL_PATH)
+    artifact = joblib.load(MODEL_PATH)
+    model = artifact["model"]
 
     y_pred = model.predict(X_test)
 
