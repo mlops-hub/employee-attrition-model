@@ -7,7 +7,7 @@ spec:
     model:
       modelFormat:
         name: sklearn
-      storageUri: "s3://ml-basics/test/"
+      storageUri: "s3://ml-basics/model/"
       resources:
         requests:
           cpu: 500m

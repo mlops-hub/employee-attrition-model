@@ -233,16 +233,6 @@ cd src
 python -m testing.predict
 ```
 
-#### Step 6: Run Web Application
-
-```bash
-cd ../frontend
-python app.py
-```
-
-Access the application at `http://localhost:5000`
-
-
 ## Key Findings
 
 - Identify primary drivers of employee attrition

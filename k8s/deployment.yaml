@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prediction-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prediction-frontend
+  template:
+    metadata:
+      labels:
+        app: prediction-frontend
+    spec:
+      containers:
+        - name: prediction-frontend
+          image: techiescamp/predictor-ui:1.0.0
+          ports:
+            - containerPort: 5000
+          env:
+            - name: MODEL_ENDPOINT
+              value: "http://model-predictor.default.svc.cluster.local:80/v1/models/model:predict"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: prediction-service
+spec:
+  selector:
+    app: prediction-frontend
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+      nodePort: 31020
+  type: NodePort 
