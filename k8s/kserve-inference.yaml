@@ -1,9 +1,11 @@
 apiVersion: "serving.kserve.io/v1beta1"
 kind: "InferenceService"
 metadata:
-  name: "model"
+  name: model
+  namespace: default
 spec:
   predictor:
+    serviceAccountName: "kserve-sa"
     model:
       modelFormat:
         name: sklearn
