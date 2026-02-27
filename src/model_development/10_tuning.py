@@ -79,7 +79,6 @@ def tuning_data(X_train, y_train, X_test, y_test):
     # Uses SimpleNamespace + bound method - no custom classes needed
     wrapped = types.SimpleNamespace(predict=tuned_pipeline.predict_proba)
     joblib.dump(wrapped, MODEL_PATH)
-    print("Exported KServe-compatible model (predict returns probabilities)")
 
     return metrics
 
